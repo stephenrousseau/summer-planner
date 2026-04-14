@@ -29,12 +29,13 @@ const getColorClass = (type, category, title) => {
 
 // Map images based on ID or title
 const getImagePreview = (id, title) => {
-  if (id === 'green-river-preserve') return '/images/grp.jpg';
-  if (id && id.startsWith('nasa-space-academy')) return '/images/space-camp.png';
-  if (id === 'torched-jewelry') return '/images/torched.jpg';
-  if (title.includes('Firefly')) return '/images/pottery.jpg';
-  if (title.includes('Tryon')) return '/images/tryon-art.jpg';
-  if (title.includes('AVL')) return '/images/avl-museum.jpg';
+  const base = import.meta.env.BASE_URL;
+  if (id === 'green-river-preserve') return `${base}images/grp.jpg`;
+  if (id && id.startsWith('nasa-space-academy')) return `${base}images/space-camp.png`;
+  if (id === 'torched-jewelry') return `${base}images/torched.jpg`;
+  if (title.includes('Firefly')) return `${base}images/pottery.jpg`;
+  if (title.includes('Tryon')) return `${base}images/tryon-art.jpg`;
+  if (title.includes('AVL')) return `${base}images/avl-museum.jpg`;
   return null; // fallback
 };
 
