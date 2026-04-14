@@ -251,7 +251,7 @@ export default function App() {
 
   const handleDrop = (e, droppedDate) => {
     e.preventDefault();
-    const type = e.dataTransfer.getData('type');
+    const type = e.dataTransfer.getData('type') || draggingType; 
     if (!type) return;
 
     const dayOfWeek = getDay(droppedDate);
@@ -690,20 +690,21 @@ export default function App() {
                            }}
                            onDragLeave={() => setHoveredDayKey(null)}
                            onClick={() => {
-                             if (selectedTrayType && isEligible) {
-                               const type = selectedTrayType;
-                               if (type === 'custom') {
-                                 setCustomPromptData({ dayOfWeek: dayNum });
-                               } else {
-                                 let title = 'Weekly Activity';
-                                 if (type === 'boxing') title = 'Boxing';
-                                 if (type === 'job') title = 'Summer Job';
-                                 if (type === 'volunteer') title = 'Volunteer';
-                                 commitWeeklyActivity(title, dayNum);
-                               }
-                               setSelectedTrayType(null);
-                             }
-                           }}
+                              const activeType = selectedTrayType || draggingType;
+                              if (activeType && isEligible) {
+                                if (activeType === 'custom') {
+                                  setCustomPromptData({ dayOfWeek: dayNum });
+                                } else {
+                                  let title = 'Weekly Activity';
+                                  if (activeType === 'boxing') title = 'Boxing';
+                                  if (activeType === 'job') title = 'Summer Job';
+                                  if (activeType === 'volunteer') title = 'Volunteer';
+                                  commitWeeklyActivity(title, dayNum);
+                                }
+                                setSelectedTrayType(null);
+                                setDraggingType(null);
+                              }
+                            }}
                            onDrop={(e) => {
                              setHoveredDayKey(null);
                              if (isEligible) {
