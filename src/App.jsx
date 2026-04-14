@@ -58,6 +58,15 @@ export default function App() {
   const [nasaPopupActive, setNasaPopupActive] = useState(false);
   const [isWeekdayOnly, setIsWeekdayOnly] = useState(false);
   const [isZoomedOut, setIsZoomedOut] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Responsive check
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 600);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Arcade Confetti Helper
   const fireConfetti = (particleCount = 100, spread = 70, origin = { y: 0.6 }) => {
@@ -339,7 +348,9 @@ export default function App() {
             top: `${10 + indexInLane * 50}px` 
           }}
         >
-          <div className="tetromino-text">{piece.title}</div>
+          <div className="tetromino-text">
+             {isZoomedOut && isMobile ? (piece.title.includes('NASA') ? '🚀' : '•') : piece.title}
+          </div>
 
           {selectedPieceId === piece.id && !piece.isFixed && (
             <div className="click-tooltip" onClick={(e) => e.stopPropagation()}>
@@ -657,11 +668,17 @@ export default function App() {
             const mCfg = getMonthConfig(weekStart);
             const isWeekActive = weekPieces.some(p => p.id === selectedPieceId);
 
+            const prevWeekMonth = wIdx > 0 ? getMonth(WEEKS_ARRAY[wIdx - 1][0]) : -1;
+            const currentWeekMonth = getMonth(weekStart);
+            const isNewMonth = currentWeekMonth !== prevWeekMonth;
+
             return (
               <div key={wIdx} className={`week-wrapper ${isZoomedOut ? 'zoomed-out' : ''}`} style={{ zIndex: isWeekActive ? 100 : 1 }}>
-                <div className="month-label" style={{ color: mCfg.color.replace('0.05', '1') }}>
-                   {mCfg.name}
-                </div>
+                {isNewMonth && (
+                  <div className="month-label" style={{ color: mCfg.color.replace('0.05', '1') }}>
+                     {mCfg.name}
+                  </div>
+                )}
                 <div className={`week-row ${isWeekdayOnly ? 'weekday-only' : ''}`} style={{ minHeight: `${reqHeight}px`, backgroundColor: mCfg.color }}>
                   
                   {/* Background grid */}
@@ -715,7 +732,7 @@ export default function App() {
                         >
                           <div className="day-header-drop-zone">
                             <div className="day-info">
-                              <span className="day-header">{format(d, 'EEE')}</span>
+                              <span className="day-header">{format(d, isMobile ? 'EEEEE' : 'EEE')}</span>
                               <span className="day-number">{format(d, 'd')}</span>
                             </div>
                             {hasWeekendActivity && <div className="weekend-indicator" title="Events scheduled on weekend">★</div>}

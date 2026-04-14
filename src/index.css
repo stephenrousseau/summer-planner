@@ -130,17 +130,21 @@ body {
 }
 
 .week-wrapper.zoomed-out {
-  margin-bottom: -15px; /* Tighten vertical space */
-  transform: scale(0.95);
-  transform-origin: top center;
+  margin-bottom: 5px;
 }
 
 .week-wrapper.zoomed-out .week-row {
-  min-height: 80px !important;
+  min-height: 40px !important;
+}
+
+/* Compact mode for events when zoomed out */
+.zoomed-out .tetromino-block {
+  height: 25px;
+  top: 8px !important;
 }
 
 .week-wrapper.zoomed-out .day-number {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
 }
 
 .month-label {
@@ -516,43 +520,72 @@ body {
   }
 
   .timeline-scroll {
-    padding: 10px 5px;
-    overflow-x: auto; /* Enable side-swipe for the grid */
-    -webkit-overflow-scrolling: touch;
+    padding: 10px;
+    overflow-x: hidden; /* No more horizontal scroll! */
   }
   
   .calendar-grid {
-    min-width: 100%; /* Fit to screen by default */
-    padding-bottom: 20px;
+    gap: 20px;
   }
   
   .week-row {
-    min-width: 600px; /* Still allow a bit of scroll inside the week row if needed, but much less than 800 */
+    min-width: 100%;
   }
 
   .week-row.weekday-only {
-    min-width: 100%; /* Weekday only should perfect fit! */
+    min-width: 100%;
   }
   
   .week-wrapper {
-    margin-left: 30px; /* Slimmer margin for side label */
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .month-label {
-    left: -35px;
-    font-size: 0.8rem;
+    position: static;
+    transform: none;
+    font-size: 1rem;
     letter-spacing: 2px;
+    margin-bottom: 5px;
+    padding-left: 5px;
+    opacity: 1;
+  }
+
+  /* Compact 'High-Level Summary' Mode on Mobile */
+  .zoomed-out .month-label {
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    margin-top: 10px;
+  }
+  .zoomed-out.week-wrapper {
+     gap: 0;
+  }
+  .zoomed-out .day-info {
+    display: none; /* Hide date details in summary */
+  }
+  .zoomed-out .week-row {
+    min-height: 30px !important;
+  }
+  .zoomed-out .events-layer {
+    top: 0;
+  }
+  .zoomed-out .tetromino-block {
+    height: 20px;
+    top: 5px !important;
+    border-width: 1px;
+    padding: 0 2px;
   }
 
   .day-header {
-    font-size: 0.5rem;
+    font-size: 0.55rem;
   }
   .day-number {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   .day-info {
     gap: 3px;
-    margin-bottom: 0;
+    margin-bottom: 5px;
   }
 
   .tutorial-modal {
