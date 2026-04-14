@@ -1,0 +1,161 @@
+{
+  "planner_config": {
+    "user": "Naomi",
+    "year": 2026,
+    "requirements": {
+      "min_camps": 2,
+      "min_weekly_activities": 1,
+      "min_job_hours": 5,
+      "min_volunteer_hours": 5
+    }
+  },
+  "fixed_events": [
+    {
+      "title": "8th Grade Grad & Anniversary Beach Trip",
+      "start": "2026-05-22",
+      "end": "2026-05-24",
+      "type": "family_trip",
+      "source": 4
+    },
+    {
+      "title": "Jack Rabbit Camping",
+      "start": "2026-06-26",
+      "end": "2026-06-28",
+      "type": "family_trip",
+      "source": 4
+    },
+    {
+      "title": "Road Trip (Philly, Lancaster, Hershey, NYC)",
+      "start": "2026-06-29",
+      "end": "2026-07-05",
+      "type": "family_trip",
+      "source": 4
+    },
+    {
+      "title": "Twin Lakes",
+      "start": "2026-07-25",
+      "end": "2026-07-25",
+      "type": "family_trip",
+      "source": 5
+    }
+  ],
+  "optional_blocks": [
+    {
+      "id": "green-river-preserve",
+      "title": "Green River Preserve: Biking/Climbing",
+      "start": "2026-06-14",
+      "end": "2026-06-19",
+      "url": "https://greenriverpreserve.org/summer-camp/base-camp-expeditions",
+      "category": "Overnight Camp",
+      "source": 1
+    },
+    {
+      "id": "nasa-space-academy",
+      "title": "NASA Space Academy Expedition",
+      "duration_days": 6,
+      "exclusive": true,
+      "url": "https://www.rocketcenter.com/SpaceCamp/Academy#block-usrcapiblock",
+      "category": "Overnight Camp",
+      "source": 2
+    },
+    {
+      "id": "firefly-japan",
+      "title": "Firefly Japan Week HELPER",
+      "start": "2026-07-06",
+      "end": "2026-07-10",
+      "focus": "Pottery, cooking, fiber arts",
+      "url": "https://www.fireflyvalleydesign.com/potterysummercamps",
+      "category": "Art Helper",
+      "source": 2
+    },
+    {
+      "id": "tryon-art-1",
+      "title": "Tryon Art School (Week 1)",
+      "start": "2026-07-06",
+      "end": "2026-07-10",
+      "category": "Art Day Camp",
+      "source": 2
+    },
+    {
+      "id": "avl-art-museum",
+      "title": "AVL Art Museum",
+      "start": "2026-07-13",
+      "end": "2026-07-17",
+      "daily_schedule": {
+        "morning": "Appalachian Arts & Crafts",
+        "afternoon": "Photography (No Camera)"
+      },
+      "category": "Art Day Camp",
+      "source": 2
+    },
+    {
+      "id": "tryon-art-2",
+      "title": "Tryon Art School (Week 2)",
+      "start": "2026-07-13",
+      "end": "2026-07-17",
+      "category": "Art Day Camp",
+      "source": 2
+    },
+    {
+      "id": "firefly-australia",
+      "title": "Firefly Australia Week HELPER",
+      "start": "2026-07-20",
+      "end": "2026-07-24",
+      "url": "https://www.fireflyvalleydesign.com/potterysummercamps",
+      "category": "Art Helper",
+      "source": 2
+    },
+    {
+      "id": "tryon-art-3",
+      "title": "Tryon Art School (Week 3)",
+      "start": "2026-07-20",
+      "end": "2026-07-24",
+      "category": "Art Day Camp",
+      "source": 2
+    },
+    {
+      "id": "firefly-cherokee",
+      "title": "Firefly Cherokee Culture Week HELPER",
+      "start": "2026-07-27",
+      "end": "2026-07-31",
+      "url": "https://www.fireflyvalleydesign.com/potterysummercamps",
+      "category": "Art Helper",
+      "source": 2
+    },
+    {
+      "id": "tryon-art-4",
+      "title": "Tryon Art School (Week 4)",
+      "start": "2026-07-27",
+      "end": "2026-07-31",
+      "category": "Art Day Camp",
+      "source": 2
+    },
+    {
+      "id": "torched-jewelry",
+      "title": "Torched Metal Smithing Jewelry Making",
+      "start": "2026-08-03",
+      "end": "2026-08-07",
+      "url": "https://torchedavl.com/calendar",
+      "category": "Specialized Skills",
+      "source": 2
+    }
+  ],
+  "recurring_blocks": [
+    {
+      "title": "Boxing",
+      "options": ["Mon 6pm", "Wed 6pm", "Sat 10am"],
+      "source": "Weekly activity"
+    },
+    {
+      "title": "Summer Job",
+      "min_hours": 5,
+      "deadline": "2026-05-01",
+      "source": 3
+    },
+    {
+      "title": "Volunteer in Saluda",
+      "min_hours": 5,
+      "source": "Volunteer"
+    }
+  ]
+}

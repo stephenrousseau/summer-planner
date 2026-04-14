@@ -1,0 +1,18 @@
+- [x] Initialize Vite/React application
+- [x] Move initial `naomi summer.JSON` into the project
+- [x] Install basic dependencies (if any needed, e.g. typical routing/icons or dnd libraries)
+- [x] Setup `styles.css` with the "Tetromino" block crusher aesthetic variables.
+- [x] Parse `naomi summer.JSON` in the React app and map into state (fixed vs optional vs recurring).
+- [x] Build the Date Grid (Top layout)
+  - Generate full date range (May 22 - Aug 9).
+  - Render pre-filled events (family trips).
+- [x] Build the Block Tray (Bottom layout)
+  - Render optional camps as draggable Tetromino pieces (N segments long).
+  - Layout the available space for dragging.
+- [x] Implement Drag and Drop logic
+  - Allow picking up pieces from tray.
+  - Allow dropping onto the dates in the calendar grid.
+  - Update React state.
+- [x] Handle Recurring tasks (Boxing 2x/wk, Jobs)
+- [x] Polish UI with animations, hover states, and premium aesthetic.
+- [x] Test & Review the app function.

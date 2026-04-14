@@ -1,0 +1,606 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800;900&family=Press+Start+2P&display=swap');
+
+:root {
+  --bg-color: #0b0914;
+  --panel-bg: #151121;
+  --grid-line: #2a2542;
+  
+  --text-main: #f0f0f5;
+  --text-dim: #9a94b5;
+
+  /* Arcade Colors */
+  --block-red: #ff3366;
+  --block-orange: #ff9933;
+  --block-yellow: #ffcc00;
+  --block-green: #00cc66;
+  --block-cyan: #00e5ff;
+  --block-blue: #3366ff;
+  --block-purple: #9933ff;
+  --block-pink: #ff33cc;
+  --block-gray: #4d4d66;
+
+  --cell-height: 45px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  overflow-x: hidden;
+  user-select: none;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.header {
+  padding: 20px;
+  background: var(--panel-bg);
+  border-bottom: 2px solid var(--grid-line);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.header h1 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.2rem;
+  background: linear-gradient(90deg, var(--block-cyan), var(--block-pink) 50%, var(--block-yellow));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
+}
+
+.stats-box {
+  display: flex;
+  gap: 20px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--block-yellow);
+}
+
+.timeline-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+/* Weekly Grid Wrapper */
+.calendar-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.week-wrapper {
+  position: relative;
+  margin-left: 60px; /* Room for month label */
+}
+
+.month-label {
+  position: absolute;
+  left: -60px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.5rem;
+  letter-spacing: 5px;
+  opacity: 0.8;
+}
+
+/* 7 columns for days */
+.week-row {
+  border: 1px solid var(--grid-line);
+  border-radius: 8px;
+  position: relative;
+  /* overflow: hidden removed to allow tooltips to bleed over bounds */
+}
+
+/* Background days layer */
+.week-bg {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 100%;
+}
+
+.day-col {
+  border-right: 1px solid var(--grid-line);
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+}
+.day-col:last-child {
+  border-right: none;
+}
+.day-col.weekend {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.day-header {
+  font-size: 0.7rem;
+  font-family: 'Press Start 2P', cursive;
+  color: var(--text-dim);
+  text-align: center;
+  margin-bottom: 5px;
+}
+.day-number {
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+  color: var(--text-main);
+  margin-bottom: 15px;
+}
+
+/* Absolute Events Layer over the week row */
+.events-layer {
+  position: absolute;
+  top: 50px; /* Below the day headers */
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none; /* Let clicks pass to blocks */
+}
+
+/* The actual piece */
+.tetromino-block {
+  position: absolute;
+  height: var(--cell-height);
+  pointer-events: auto;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.8);
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-top: 3px solid rgba(255,255,255,0.4);
+  border-left: 3px solid rgba(255,255,255,0.4);
+  border-bottom: 3px solid rgba(0,0,0,0.5);
+  border-right: 3px solid rgba(0,0,0,0.5);
+}
+
+.tetromino-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
+.tetromino-block:hover {
+  transform: scale(1.02);
+  z-index: 10;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.tetromino-block.status-inactive {
+  opacity: 0.4;
+  filter: grayscale(80%) brightness(0.8);
+  border-style: dashed;
+}
+
+.tetromino-block.status-inactive:hover {
+  opacity: 0.9;
+  filter: grayscale(0%);
+  border-style: solid;
+}
+
+.tetromino-block.status-active {
+  opacity: 1;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+
+/* Colors */
+.color-family_trip { background-color: var(--block-orange); }
+.color-overnight { background-color: var(--block-purple); } /* ALL camps are purple now */
+.color-art { background-color: var(--block-purple); } /* ALL camps are purple now */
+.color-skills { background-color: var(--block-cyan); }
+.color-weekly { background-color: var(--block-green); }
+.color-job { background-color: var(--block-yellow); }
+
+.color-iridescent {
+  background: linear-gradient(124deg, #ff3366, #ff9933, #ffcc00, #00cc66, #00e5ff, #3366ff, #9933ff, #ff33cc);
+  background-size: 1800% 1800%;
+  animation: rainbow-shimmer 4s ease infinite;
+  color: #fff;
+  border-top: 3px solid rgba(255,255,255,0.8);
+  border-left: 3px solid rgba(255,255,255,0.8);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes rainbow-shimmer {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
+}
+
+/* Tutorial overlay setup */
+.tutorial-overlay {
+  position: fixed;
+  top: 0; left:0; right:0; bottom:0;
+  background: rgba(11, 9, 20, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+}
+.tutorial-modal {
+  background: var(--panel-bg);
+  padding: 40px;
+  border-radius: 12px;
+  max-width: 500px;
+  border: 2px solid var(--block-cyan);
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+  text-align: center;
+}
+
+.click-tooltip {
+  position: absolute;
+  top: 110%; /* Just below the block */
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--panel-bg);
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  border: 2px solid var(--block-cyan);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  z-index: 500;
+  cursor: default;
+  color: var(--text-main);
+  text-align: center;
+  white-space: normal;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.click-tooltip h4 {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--block-pink);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+
+.click-tooltip img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--grid-line);
+}
+
+.click-tooltip p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
+.click-tooltip a {
+  color: var(--block-cyan);
+  text-decoration: none;
+  font-weight: 800;
+}
+
+.click-tooltip button {
+  background: var(--block-green);
+  color: #000;
+  border: none;
+  padding: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 5px;
+}
+.click-tooltip button:hover {
+  filter: brightness(1.2);
+}
+
+.recap-list {
+  list-style: none;
+  font-size: 1.2rem;
+  color: var(--block-green);
+  text-align: left;
+  display: inline-block;
+  margin: 20px 0;
+}
+
+.tutorial-modal h2 {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--block-pink);
+  margin-bottom: 20px;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.tutorial-modal p {
+  color: var(--text-dim);
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+}
+.tutorial-btn {
+  background: var(--block-cyan);
+  color: #000;
+  border: none;
+  padding: 15px 30px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.tutorial-btn:hover {
+  transform: scale(1.05);
+}
+
+/* Finish Banner */
+.finish-banner {
+  background: var(--block-green);
+  color: #000;
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  animation: pulse 2s infinite;
+  z-index: 50;
+  box-shadow: 0 10px 30px rgba(0, 204, 102, 0.5);
+}
+.finish-banner:hover {
+  filter: brightness(1.2);
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+/* Tooltip arrow */
+.tooltip-point {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--block-pink);
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  pointer-events: none;
+  white-space: nowrap;
+  animation: bounce 1s infinite;
+  z-index: 100;
+}
+
+@keyframes bounce {
+  0% { top: -45px; }
+  50% { top: -35px; }
+  100% { top: -45px; }
+}
+
+.shimmer-glow {
+  box-shadow: 0 0 20px var(--block-pink);
+  animation: shimmer 1s infinite alternate;
+}
+
+@keyframes shimmer {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.5); }
+}
+
+/* Mobile Responsive Adjustments (Pixel 7 / Portrait) */
+@media (max-width: 600px) {
+  .header {
+    padding: 10px;
+    gap: 5px;
+  }
+  .header h1 {
+    font-size: 0.8rem;
+    white-space: normal;
+    text-align: center;
+  }
+  .stats-box {
+    font-size: 0.8rem;
+    gap: 10px;
+  }
+
+  .finish-banner {
+    padding: 12px;
+    font-size: 0.9rem;
+    line-height: 1.2;
+  }
+
+  .timeline-scroll {
+    padding: 10px 5px;
+    overflow-x: auto; /* Enable side-swipe for the grid */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .calendar-grid {
+    min-width: 800px; /* Force room for 7 days + labels */
+    padding-bottom: 20px;
+  }
+  
+  .week-wrapper {
+    margin-left: 30px; /* Slimmer margin for side label */
+  }
+
+  .month-label {
+    left: -35px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+  }
+
+  .day-header {
+    font-size: 0.5rem;
+  }
+  .day-number {
+    font-size: 1rem;
+    margin-bottom: 5px;
+  }
+
+  .tutorial-modal {
+    padding: 20px;
+    width: 95%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .tutorial-modal h2 {
+    font-size: 0.9rem;
+  }
+  .tutorial-modal p {
+    font-size: 0.9rem;
+  }
+
+  .click-tooltip {
+    width: 280px;
+    position: fixed; /* Fix to screen center on mobile instead of relative to block */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .drag-tray {
+    padding: 10px;
+  }
+  .drag-tray h4 {
+    font-size: 0.6rem;
+  }
+  .tray-items {
+    gap: 15px;
+    transform: scale(0.8); /* Shrink tray items to fit */
+    transform-origin: bottom center;
+  }
+}
+
+/* Drag and Drop Tray */
+.drag-tray {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--panel-bg);
+  padding: 15px 20px;
+  border-top: 2px solid var(--grid-line);
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.drag-tray h4 {
+  font-family: 'Press Start 2P', cursive;
+  color: var(--block-cyan);
+  font-size: 0.8rem;
+}
+
+.tray-items {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end; /* Align shapes natively at their base */
+  padding-bottom: 20px;
+}
+
+.tetromino-shape {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  cursor: grab;
+  transform: scale(1);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.tetromino-shape:hover {
+  transform: scale(1.15) translateY(-5px);
+}
+.tetromino-shape:active {
+  cursor: grabbing;
+}
+
+.t-cube {
+  border-top: 3px solid rgba(255,255,255,0.4);
+  border-left: 3px solid rgba(255,255,255,0.4);
+  border-bottom: 3px solid rgba(0,0,0,0.5);
+  border-right: 3px solid rgba(0,0,0,0.5);
+  border-radius: 4px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+.tetro-label {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Press Start 2P', cursive;
+  font-size: 0.65rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Custom Text Input */
+.custom-text-input {
+  width: 100%;
+  padding: 15px;
+  margin-top: 15px;
+  background: var(--bg-color);
+  border: 2px solid var(--block-cyan);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.2rem;
+  font-weight: 800;
+  text-align: center;
+}
+.custom-text-input:focus {
+  outline: none;
+  box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+}
+
+.day-col.hover-active {
+  background: rgba(0, 229, 255, 0.15);
+  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.3);
+  cursor: copy;
+}
+
+/* Fix flickering: prevent children from stealing drag events */
+.app-container.is-dragging .day-col * {
+  pointer-events: none;
+}
+
+.day-header-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px;
+}
+
+.drop-zone {
+  display: none; 
+}
