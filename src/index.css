@@ -187,18 +187,20 @@ body {
 }
 
 .day-header {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-family: 'Press Start 2P', cursive;
   color: var(--text-dim);
-  text-align: center;
-  margin-bottom: 5px;
 }
 .day-number {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  text-align: center;
   color: var(--text-main);
-  margin-bottom: 15px;
+}
+.day-info {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
 }
 
 .weekend-indicator {
@@ -326,7 +328,7 @@ body {
   width: 300px;
   border: 2px solid var(--block-cyan);
   box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  z-index: 500;
+  z-index: 1000;
   cursor: default;
   color: var(--text-main);
   text-align: center;
@@ -546,8 +548,11 @@ body {
     font-size: 0.5rem;
   }
   .day-number {
-    font-size: 1rem;
-    margin-bottom: 5px;
+    font-size: 0.9rem;
+  }
+  .day-info {
+    gap: 3px;
+    margin-bottom: 0;
   }
 
   .tutorial-modal {

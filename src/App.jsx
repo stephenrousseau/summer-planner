@@ -655,9 +655,10 @@ export default function App() {
 
             const reqHeight = Math.max(90, 60 + lanes.length * 50);
             const mCfg = getMonthConfig(weekStart);
+            const isWeekActive = weekPieces.some(p => p.id === selectedPieceId);
 
             return (
-              <div key={wIdx} className={`week-wrapper ${isZoomedOut ? 'zoomed-out' : ''}`}>
+              <div key={wIdx} className={`week-wrapper ${isZoomedOut ? 'zoomed-out' : ''}`} style={{ zIndex: isWeekActive ? 100 : 1 }}>
                 <div className="month-label" style={{ color: mCfg.color.replace('0.05', '1') }}>
                    {mCfg.name}
                 </div>
@@ -712,8 +713,10 @@ export default function App() {
                            }}
                         >
                           <div className="day-header-drop-zone">
-                            <div className="day-header">{format(d, 'EEE')}</div>
-                            <div className="day-number">{format(d, 'd')}</div>
+                            <div className="day-info">
+                              <span className="day-header">{format(d, 'EEE')}</span>
+                              <span className="day-number">{format(d, 'd')}</span>
+                            </div>
                             {hasWeekendActivity && <div className="weekend-indicator" title="Events scheduled on weekend">★</div>}
                           </div>
                         </div>
