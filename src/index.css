@@ -51,6 +51,43 @@ body {
   align-items: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   z-index: 10;
+  gap: 15px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.view-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.view-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--block-cyan);
+  color: var(--block-cyan);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.view-btn:hover {
+  background: rgba(0, 229, 255, 0.1);
+}
+
+.view-btn.active {
+  background: var(--block-cyan);
+  color: #000;
 }
 
 .header h1 {
@@ -89,6 +126,21 @@ body {
 .week-wrapper {
   position: relative;
   margin-left: 60px; /* Room for month label */
+  transition: all 0.3s ease;
+}
+
+.week-wrapper.zoomed-out {
+  margin-bottom: -15px; /* Tighten vertical space */
+  transform: scale(0.95);
+  transform-origin: top center;
+}
+
+.week-wrapper.zoomed-out .week-row {
+  min-height: 80px !important;
+}
+
+.week-wrapper.zoomed-out .day-number {
+  font-size: 0.9rem;
 }
 
 .month-label {
@@ -117,6 +169,10 @@ body {
   height: 100%;
 }
 
+.week-row.weekday-only .week-bg {
+  grid-template-columns: repeat(5, 1fr);
+}
+
 .day-col {
   border-right: 1px solid var(--grid-line);
   display: flex;
@@ -143,6 +199,13 @@ body {
   text-align: center;
   color: var(--text-main);
   margin-bottom: 15px;
+}
+
+.weekend-indicator {
+  color: var(--block-yellow);
+  font-size: 1.2rem;
+  margin-top: -5px;
+  filter: drop-shadow(0 0 5px var(--block-yellow));
 }
 
 /* Absolute Events Layer over the week row */
@@ -425,6 +488,23 @@ body {
   .stats-box {
     font-size: 0.8rem;
     gap: 10px;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .view-controls {
+    gap: 5px;
+  }
+
+  .view-btn {
+    font-size: 0.7rem;
+    padding: 4px 8px;
   }
 
   .finish-banner {
@@ -440,8 +520,16 @@ body {
   }
   
   .calendar-grid {
-    min-width: 800px; /* Force room for 7 days + labels */
+    min-width: 100%; /* Fit to screen by default */
     padding-bottom: 20px;
+  }
+  
+  .week-row {
+    min-width: 600px; /* Still allow a bit of scroll inside the week row if needed, but much less than 800 */
+  }
+
+  .week-row.weekday-only {
+    min-width: 100%; /* Weekday only should perfect fit! */
   }
   
   .week-wrapper {

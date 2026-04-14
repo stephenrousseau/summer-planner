@@ -56,6 +56,8 @@ export default function App() {
   const [hoveredDayKey, setHoveredDayKey] = useState(null);
   const [selectedTrayType, setSelectedTrayType] = useState(null);
   const [nasaPopupActive, setNasaPopupActive] = useState(false);
+  const [isWeekdayOnly, setIsWeekdayOnly] = useState(false);
+  const [isZoomedOut, setIsZoomedOut] = useState(false);
 
   // Arcade Confetti Helper
   const fireConfetti = (particleCount = 100, spread = 70, origin = { y: 0.6 }) => {
@@ -286,30 +288,34 @@ export default function App() {
 
   // Rendering a block within a week
   const renderBlockForWeek = (weekDays, piece, indexInLane) => {
-    const weekStart = weekDays[0];
-    const weekEnd = weekDays[6];
+    const daysInView = isWeekdayOnly ? 5 : 7;
+    const offsetCalcStart = isWeekdayOnly ? addDays(weekStart, 1) : weekStart; // Mon vs Sun
+    const offsetCalcEnd = isWeekdayOnly ? addDays(weekStart, 5) : weekEnd; // Fri vs Sat
 
-    if (piece.endDate < weekStart || piece.startDate > weekEnd) return null;
+    if (piece.endDate < offsetCalcStart || piece.startDate > offsetCalcEnd) return null;
 
     const isActive = activeIds.has(piece.id);
 
     // Filters for tutorial steps
-    if (tutorialStep === 1 && !piece.isFixed) return null; // hide everything but fixed
-    if (tutorialStep === 2 && piece.type === 'weekly') return null; // camps only
-    if (tutorialStep === 3 && piece.type === 'weekly') return null; // hide weekly during interstitial
-    if (tutorialStep === 4 && piece.type === 'weekly' && !isActive) return null; // hide inactive weeklies
-    if (tutorialStep >= 4 && piece.type === 'camp' && !isActive) return null; // hide all inactive camps once we move to weekly/finish
-    if (tutorialStep >= 5 && !isActive && !piece.isFixed) return null; // final calendar ONLY shows what she picked!
-    if (tutorialStep === 6 && !isActive && !piece.isFixed) return null; // safety redundancy
+    if (tutorialStep === 1 && !piece.isFixed) return null; 
+    if (tutorialStep === 2 && piece.type === 'weekly') return null; 
+    if (tutorialStep === 3 && piece.type === 'weekly') return null; 
+    if (tutorialStep === 4 && piece.type === 'weekly' && !isActive) return null; 
+    if (tutorialStep >= 4 && piece.type === 'camp' && !isActive) return null; 
+    if (tutorialStep >= 5 && !isActive && !piece.isFixed) return null; 
+    if (tutorialStep === 6 && !isActive && !piece.isFixed) return null; 
 
-    const startOffset = differenceInDays(piece.startDate < weekStart ? weekStart : piece.startDate, weekStart);
-    const endOffset = differenceInDays(piece.endDate > weekEnd ? weekEnd : piece.endDate, weekStart);
-    const lengthInWeek = endOffset - startOffset + 1;
+    const startForCalc = piece.startDate < offsetCalcStart ? offsetCalcStart : piece.startDate;
+    const endForCalc = piece.endDate > offsetCalcEnd ? offsetCalcEnd : piece.endDate;
+
+    const startOffset = differenceInDays(startForCalc, offsetCalcStart);
+    const endOffset = differenceInDays(endForCalc, offsetCalcStart);
+    const lengthInView = endOffset - startOffset + 1;
 
     const statusClass = isActive ? 'status-active' : 'status-inactive';
 
-    const leftPercent = (startOffset / 7) * 100;
-    const widthPercent = (lengthInWeek / 7) * 100;
+    const leftPercent = (startOffset / daysInView) * 100;
+    const widthPercent = (lengthInView / daysInView) * 100;
     
     // Step 2 Guidance
     const showCampGuidance = (tutorialStep === 2 && campsCount < 2 && piece.type === 'camp' && !isActive);
@@ -461,7 +467,25 @@ export default function App() {
       )}
 
       <header className="header">
-        <h1>Summer Vacation Planner</h1>
+        <div className="header-left">
+          <h1>Summer Planner</h1>
+          <div className="view-controls">
+            <button 
+              className={`view-btn ${isWeekdayOnly ? 'active' : ''}`} 
+              onClick={(e) => { e.stopPropagation(); setIsWeekdayOnly(!isWeekdayOnly); }}
+              title="Toggle Weekends"
+            >
+              {isWeekdayOnly ? "📅 7-Day" : "📅 5-Day"}
+            </button>
+            <button 
+              className={`view-btn ${isZoomedOut ? 'active' : ''}`} 
+              onClick={(e) => { e.stopPropagation(); setIsZoomedOut(!isZoomedOut); }}
+              title="Toggle Zoom"
+            >
+              {isZoomedOut ? "🔍 Zoom In" : "🔍 Zoom Out"}
+            </button>
+          </div>
+        </div>
         <div className="stats-box">
            <div>Camps: {campsCount}/{campsTarget}</div>
            <div>Weekly: {weeklyCount}/1</div>
@@ -592,9 +616,10 @@ export default function App() {
 
       <main className="timeline-scroll">
         <div className="calendar-grid">
-          {WEEKS_ARRAY.map((weekDays, wIdx) => {
-            const weekStart = weekDays[0];
-            const weekEnd = weekDays[6];
+          {WEEKS_ARRAY.map((originalWeekDays, wIdx) => {
+            const weekDays = isWeekdayOnly ? originalWeekDays.slice(1, 6) : originalWeekDays;
+            const weekStart = originalWeekDays[0];
+            const weekEnd = originalWeekDays[6];
             let weekPieces = allPieces.filter(p => p.endDate >= weekStart && p.startDate <= weekEnd);
 
             // Filter out items that won't be rendered
@@ -632,11 +657,11 @@ export default function App() {
             const mCfg = getMonthConfig(weekStart);
 
             return (
-              <div key={wIdx} className="week-wrapper">
+              <div key={wIdx} className={`week-wrapper ${isZoomedOut ? 'zoomed-out' : ''}`}>
                 <div className="month-label" style={{ color: mCfg.color.replace('0.05', '1') }}>
                    {mCfg.name}
                 </div>
-                <div className="week-row" style={{ minHeight: `${reqHeight}px`, backgroundColor: mCfg.color }}>
+                <div className={`week-row ${isWeekdayOnly ? 'weekday-only' : ''}`} style={{ minHeight: `${reqHeight}px`, backgroundColor: mCfg.color }}>
                   
                   {/* Background grid */}
                   <div className="week-bg">
@@ -646,10 +671,16 @@ export default function App() {
                       const activeType = draggingType || selectedTrayType;
                       const isEligible = activeType && (activeType !== 'boxing' || [1, 3, 6].includes(dayNum));
 
+                      // Check if there's a hidden weekend activity for this week
+                      const hasWeekendActivity = isWeekdayOnly && dIdx === 4 && weekPieces.some(p => {
+                         const pDay = getDay(p.startDate);
+                         return (pDay === 0 || pDay === 6) && activeIds.has(p.id);
+                      });
+
                       return (
                         <div 
                            key={dIdx} 
-                           className={`day-col ${dIdx === 0 || dIdx === 6 ? 'weekend' : ''} ${isEligible ? 'drop-eligible' : ''} ${hoveredDayKey === `${wIdx}-${dIdx}` || (selectedTrayType && isEligible) ? 'hover-active' : ''}`}
+                           className={`day-col ${dIdx === 0 || dIdx === 6 || (isWeekdayOnly && (dIdx === -1)) ? 'weekend' : ''} ${isEligible ? 'drop-eligible' : ''} ${hoveredDayKey === `${wIdx}-${dIdx}` || (selectedTrayType && isEligible) ? 'hover-active' : ''}`}
                            onDragOver={(e) => {
                              if (isEligible) e.preventDefault();
                            }}
@@ -683,6 +714,7 @@ export default function App() {
                           <div className="day-header-drop-zone">
                             <div className="day-header">{format(d, 'EEE')}</div>
                             <div className="day-number">{format(d, 'd')}</div>
+                            {hasWeekendActivity && <div className="weekend-indicator" title="Events scheduled on weekend">★</div>}
                           </div>
                         </div>
                       );
