@@ -55,6 +55,7 @@ export default function App() {
   const [draggingType, setDraggingType] = useState(null);
   const [hoveredDayKey, setHoveredDayKey] = useState(null);
   const [selectedTrayType, setSelectedTrayType] = useState(null);
+  const [nasaPopupActive, setNasaPopupActive] = useState(false);
 
   // Arcade Confetti Helper
   const fireConfetti = (particleCount = 100, spread = 70, origin = { y: 0.6 }) => {
@@ -134,7 +135,7 @@ export default function App() {
       
       let desc = blk.focus || blk.category || "A fun summer camp experience!";
       if (blk.id === 'green-river-preserve') desc = "Mountain biking, rock climbing, and lush forest outdoor adventure!";
-      if (blk.title.includes('NASA')) desc = "High-tech rocket building, simulation, and astronaut training!\n\nThis camp is really special, so if you pick it, it'll be the only summer camp we can do this summer!";
+      if (blk.title.includes('NASA')) desc = "High-tech rocket building, simulation, and astronaut training!";
       if (blk.title.includes('Art') || blk.title.includes('Firefly')) desc = "Arts, crafts, pottery, and hands-on creative making!";
       if (blk.title.includes('Torched')) desc = "Learn metal smithing and craft your own jewelry accessories.";
 
@@ -213,6 +214,10 @@ export default function App() {
           if (alreadyHasNasa) {
               alert("You've already picked NASA Space Academy! If you want to pick this camp, you'll need to remove NASA first.");
               return prev;
+          }
+
+          if (movingToNasa) {
+              setNasaPopupActive(true);
           }
       }
 
@@ -406,6 +411,18 @@ export default function App() {
         </div>
       )}
 
+      {/* NASA Special Warning Popup */}
+      {nasaPopupActive && (
+        <div className="tutorial-overlay">
+          <div className="tutorial-modal">
+            <h2>A SPECIAL CHOICE! 🚀</h2>
+            <p>NASA Space Academy is an amazing, high-tech experience.</p>
+            <p><strong>This camp is really special, so if you pick it, it'll be the only summer camp we can do this summer!</strong></p>
+            <button className="tutorial-btn" onClick={() => setNasaPopupActive(false)}>Got It!</button>
+          </div>
+        </div>
+      )}
+
       {/* 3. Interstitial Summary Modal */}
       {tutorialStep === 3 && (
         <div className="tutorial-overlay">
@@ -459,7 +476,7 @@ export default function App() {
       )}
 
       {/* Step 2 Progression Banner */}
-      {campsCount >= 2 && tutorialStep === 2 && (
+      {campsCount >= campsTarget && tutorialStep === 2 && (
          <div className="finish-banner" onClick={() => setTutorialStep(3)}>
             DONE PICKING CAMPS!
          </div>
