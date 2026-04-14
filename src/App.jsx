@@ -288,11 +288,11 @@ export default function App() {
 
   // Rendering a block within a week
   const renderBlockForWeek = (weekDays, piece, indexInLane) => {
-    const daysInView = isWeekdayOnly ? 5 : 7;
-    const offsetCalcStart = isWeekdayOnly ? addDays(weekStart, 1) : weekStart; // Mon vs Sun
-    const offsetCalcEnd = isWeekdayOnly ? addDays(weekStart, 5) : weekEnd; // Fri vs Sat
+    const daysInView = weekDays.length;
+    const weekStart = weekDays[0];
+    const weekEnd = weekDays[daysInView - 1];
 
-    if (piece.endDate < offsetCalcStart || piece.startDate > offsetCalcEnd) return null;
+    if (piece.endDate < weekStart || piece.startDate > weekEnd) return null;
 
     const isActive = activeIds.has(piece.id);
 
@@ -305,11 +305,11 @@ export default function App() {
     if (tutorialStep >= 5 && !isActive && !piece.isFixed) return null; 
     if (tutorialStep === 6 && !isActive && !piece.isFixed) return null; 
 
-    const startForCalc = piece.startDate < offsetCalcStart ? offsetCalcStart : piece.startDate;
-    const endForCalc = piece.endDate > offsetCalcEnd ? offsetCalcEnd : piece.endDate;
+    const startForCalc = piece.startDate < weekStart ? weekStart : piece.startDate;
+    const endForCalc = piece.endDate > weekEnd ? weekEnd : piece.endDate;
 
-    const startOffset = differenceInDays(startForCalc, offsetCalcStart);
-    const endOffset = differenceInDays(endForCalc, offsetCalcStart);
+    const startOffset = differenceInDays(startForCalc, weekStart);
+    const endOffset = differenceInDays(endForCalc, weekStart);
     const lengthInView = endOffset - startOffset + 1;
 
     const statusClass = isActive ? 'status-active' : 'status-inactive';
