@@ -51,7 +51,7 @@
     },
     {
       "id": "nasa-space-academy-may",
-      "title": "NASA Space Academy (Exp 36)",
+      "title": "NASA Space Academy",
       "start": "2026-05-31",
       "end": "2026-06-05",
       "exclusive": true,
@@ -61,7 +61,7 @@
     },
     {
       "id": "nasa-space-academy-jun",
-      "title": "NASA Space Academy (Exp 37)",
+      "title": "NASA Space Academy",
       "start": "2026-06-07",
       "end": "2026-06-12",
       "exclusive": true,
@@ -71,7 +71,7 @@
     },
     {
       "id": "nasa-space-academy-jul",
-      "title": "NASA Space Academy (Exp 44)",
+      "title": "NASA Space Academy",
       "start": "2026-07-26",
       "end": "2026-07-31",
       "exclusive": true,
@@ -81,7 +81,7 @@
     },
     {
       "id": "nasa-space-academy-aug",
-      "title": "NASA Space Academy (Exp 45)",
+      "title": "NASA Space Academy",
       "start": "2026-08-02",
       "end": "2026-08-07",
       "exclusive": true,

@@ -133,7 +133,7 @@ export default function App() {
       
       let desc = blk.focus || blk.category || "A fun summer camp experience!";
       if (blk.id === 'green-river-preserve') desc = "Mountain biking, rock climbing, and lush forest outdoor adventure!";
-      if (blk.title.includes('NASA')) desc = "High-tech rocket building, simulation, and astronaut training!";
+      if (blk.title.includes('NASA')) desc = "High-tech rocket building, simulation, and astronaut training!\n\nThis camp is really special, so if you pick it, it'll be the only summer camp we can do this summer!";
       if (blk.title.includes('Art') || blk.title.includes('Firefly')) desc = "Arts, crafts, pottery, and hands-on creative making!";
       if (blk.title.includes('Torched')) desc = "Learn metal smithing and craft your own jewelry accessories.";
 
@@ -184,19 +184,36 @@ export default function App() {
   const [activeIds, setActiveIds] = useState(initialActive);
   
   // Requirement counters
-  const activeCampIds = new Set(allPieces.filter(p => p.type === 'camp' && activeIds.has(p.id)).map(p => p.id));
+  const activeCamps = allPieces.filter(p => p.type === 'camp' && activeIds.has(p.id));
+  const activeCampIds = new Set(activeCamps.map(p => p.id));
   const activeWeeklyGroups = new Set(allPieces.filter(p => p.type === 'weekly' && activeIds.has(p.id)).map(p => p.groupId));
   
+  const hasNasa = activeCamps.some(p => p.title.includes('NASA'));
   const campsCount = activeCampIds.size;
   const weeklyCount = activeWeeklyGroups.size;
   
-  const meetsRequirements = campsCount >= 2 && weeklyCount >= 1;
+  const campsTarget = hasNasa ? 1 : 2;
+  const meetsRequirements = campsCount >= campsTarget && weeklyCount >= 1;
 
   // Toggling piece
   const togglePieceActive = (piece) => {
     setActiveIds(prev => {
       const next = new Set(prev);
       const isCurrentlyActive = prev.has(piece.id);
+
+      if (piece.type === 'camp' && !isCurrentlyActive) {
+          const movingToNasa = piece.title.includes('NASA');
+          const alreadyHasNasa = activeCamps.some(p => p.title.includes('NASA'));
+          
+          if (movingToNasa && activeCamps.length > 0) {
+              alert("Wait! If you pick NASA Space Academy, it'll be the only camp for the summer. Please remove your other camps first!");
+              return prev;
+          }
+          if (alreadyHasNasa) {
+              alert("You've already picked NASA Space Academy! If you want to pick this camp, you'll need to remove NASA first.");
+              return prev;
+          }
+      }
 
       if (piece.groupId) {
         const groupPieces = allPieces.filter(p => p.groupId === piece.groupId);
@@ -428,7 +445,7 @@ export default function App() {
       <header className="header">
         <h1>Summer Vacation Planner</h1>
         <div className="stats-box">
-           <div>Camps: {campsCount}/2</div>
+           <div>Camps: {campsCount}/{campsTarget}</div>
            <div>Weekly: {weeklyCount}/1</div>
         </div>
       </header>
