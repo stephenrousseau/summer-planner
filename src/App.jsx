@@ -18,13 +18,26 @@ for (let i = 0; i < TOTAL_DAYS; i += 7) {
   WEEKS_ARRAY.push(DAYS_ARRAY.slice(i, i + 7));
 }
 
-// Colors (All camps are now the same color as requested!)
 const getColorClass = (type, category, title) => {
   if (type === 'family_trip') return 'color-family_trip';
   if (title.includes('Job') || title.includes('Volunteer')) return 'color-job';
   if (title.includes('Boxing')) return 'color-weekly';
-  // All other optional are camps
   return 'color-overnight'; 
+};
+
+// Map emojis for visual flair
+const getEmoji = (type, category, title) => {
+  if (type === 'family_trip' || title.includes('Beach') || title.includes('Road Trip') || title.includes('Twin Lakes')) return '🚗';
+  if (title.includes('Birthday')) return '🎂';
+  if (title.includes('NASA')) return '🚀';
+  if (title.includes('Green River')) return '🏕️';
+  if (title.includes('Firefly') || title.includes('Pottery')) return '🏺';
+  if (title.includes('Tryon') || title.includes('Art Museum') || category?.includes('Art')) return '🎨';
+  if (title.includes('Torched') || title.includes('Jewelry')) return '⚒️';
+  if (title.includes('Boxing')) return '🥊';
+  if (title.includes('Job')) return '💰';
+  if (title.includes('Volunteer')) return '🧡';
+  return '⭐️';
 };
 
 // Map images based on ID or title
@@ -56,7 +69,7 @@ export default function App() {
   const [hoveredDayKey, setHoveredDayKey] = useState(null);
   const [selectedTrayType, setSelectedTrayType] = useState(null);
   const [nasaPopupActive, setNasaPopupActive] = useState(false);
-  const [isWeekdayOnly, setIsWeekdayOnly] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState({}); // { pieceId: "Climbing" }
   const [isZoomedOut, setIsZoomedOut] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -116,6 +129,7 @@ export default function App() {
         startDate: parseDate(evt.start),
         endDate: parseDate(evt.end),
         colorClass: getColorClass(evt.type, null, evt.title),
+        emoji: getEmoji(evt.type, null, evt.title),
         isFixed: true,
         type: 'fixed',
         desc: "A pre-planned family event!",
@@ -128,10 +142,11 @@ export default function App() {
     pieces.push({
       id: 'fixed_bday',
       groupId: null,
-      title: "NAOMI'S BIRTHDAY! 🎂",
+      title: "NAOMI'S BIRTHDAY!",
       startDate: parseDate('2026-08-17'),
       endDate: parseDate('2026-08-17'),
       colorClass: 'color-iridescent',
+      emoji: getEmoji(null, null, 'Birthday'),
       isFixed: true,
       type: 'fixed',
       desc: "Time to celebrate!!! 🎉",
@@ -144,19 +159,25 @@ export default function App() {
       const length = blk.duration_days || (blk.end ? differenceInDays(parseDate(blk.end), s) + 1 : 1);
       const e = addDays(s, length - 1);
       
+      
       let desc = blk.focus || blk.category || "A fun summer camp experience!";
       if (blk.id === 'green-river-preserve') desc = "Mountain biking, rock climbing, and lush forest outdoor adventure!";
       if (blk.title.includes('NASA')) desc = "High-tech rocket building, simulation, and astronaut training!";
       if (blk.title.includes('Art') || blk.title.includes('Firefly')) desc = "Arts, crafts, pottery, and hands-on creative making!";
       if (blk.title.includes('Torched')) desc = "Learn metal smithing and craft your own jewelry accessories.";
 
+      const flavor = selectedOptions[blk.id];
+      const displayTitle = flavor ? `${blk.title} (${flavor})` : blk.title;
+
       pieces.push({
         id: blk.id || `opt_${pId++}`,
         groupId: null,
-        title: blk.title,
+        title: displayTitle,
+        baseTitle: blk.title,
         startDate: s,
         endDate: e,
         colorClass: getColorClass(null, blk.category, blk.title),
+        emoji: getEmoji(null, blk.category, blk.title),
         isFixed: false,
         type: 'camp',
         desc: desc,
@@ -180,6 +201,7 @@ export default function App() {
             startDate: d,
             endDate: d,
             colorClass: isBoxing ? 'color-weekly' : (cw.title.includes('Job') || cw.title.includes('Volunteer') ? 'color-job' : 'color-skills'), 
+            emoji: getEmoji(null, null, cw.title),
             isFixed: false,
             type: 'weekly',
             desc: isBoxing ? "Weekly boxing sessions every Mon, Wed, and Sat." : "Your weekly activity!",
@@ -202,14 +224,16 @@ export default function App() {
   const activeWeeklyGroups = new Set(allPieces.filter(p => p.type === 'weekly' && activeIds.has(p.id)).map(p => p.groupId));
   
   const hasNasa = activeCamps.some(p => p.title.includes('NASA'));
+  const hasTryon = activeCamps.some(p => p.title.includes('Tryon'));
   const campsCount = activeCampIds.size;
   const weeklyCount = activeWeeklyGroups.size;
   
-  const campsTarget = hasNasa ? 1 : 2;
+  // Rule: NASA is exclusive UNLESS the other camp is Tryon Art School (max 1 Tryon week).
+  const campsTarget = hasNasa ? (hasTryon ? 2 : 1) : 2;
   const meetsRequirements = campsCount >= campsTarget && weeklyCount >= 1;
 
   // Toggling piece
-  const togglePieceActive = (piece) => {
+  const togglePieceActive = (piece, flavor = null) => {
     setActiveIds(prev => {
       const next = new Set(prev);
       const isCurrentlyActive = prev.has(piece.id);
@@ -217,18 +241,27 @@ export default function App() {
       if (piece.type === 'camp' && !isCurrentlyActive) {
           const movingToNasa = piece.title.includes('NASA');
           const alreadyHasNasa = activeCamps.some(p => p.title.includes('NASA'));
+          const movingToTryon = piece.title.includes('Tryon');
           
-          if (movingToNasa && activeCamps.length > 0) {
-              alert("Wait! If you pick NASA Space Academy, it'll be the only camp for the summer. Please remove your other camps first!");
-              return prev;
-          }
-          if (alreadyHasNasa) {
-              alert("You've already picked NASA Space Academy! If you want to pick this camp, you'll need to remove NASA first.");
-              return prev;
-          }
-
           if (movingToNasa) {
+              const nonTryonCamps = activeCamps.filter(p => !p.title.includes('Tryon'));
+              if (nonTryonCamps.length > 0) {
+                  alert("Wait! NASA Space Academy is very special. If you pick it, you can only pick one other camp this summer, and it has to be Tryon Art School. Please remove your other camps first!");
+                  return prev;
+              }
+              if (activeCamps.length > 1) {
+                  alert("Wait! If you pick NASA, you can only pick ONE week of Tryon Art School. Please remove your extra camps first!");
+                  return prev;
+              }
               setNasaPopupActive(true);
+          } else if (alreadyHasNasa) {
+              if (!movingToTryon) {
+                  alert("You've already picked NASA Space Academy! If you want to pick this camp, you'll need to remove NASA first.");
+                  return prev;
+              } else if (activeCamps.length >= 2) {
+                  alert("Since you picked NASA, you can only pick one week of Tryon Art School. Please remove your other Tryon week first!");
+                  return prev;
+              }
           }
       }
 
@@ -239,8 +272,19 @@ export default function App() {
           else next.add(p.id);
         });
       } else {
-        if (isCurrentlyActive) next.delete(piece.id);
-        else next.add(piece.id);
+        if (isCurrentlyActive) {
+          next.delete(piece.id);
+          setSelectedOptions(prev => {
+            const n = {...prev};
+            delete n[piece.id];
+            return n;
+          });
+        } else {
+          next.add(piece.id);
+          if (flavor) {
+            setSelectedOptions(prev => ({...prev, [piece.id]: flavor}));
+          }
+        }
       }
       return next;
     });
@@ -249,10 +293,11 @@ export default function App() {
 
   const handleBlockClick = (e, piece) => {
     e.stopPropagation();
-    if (piece.isFixed || tutorialStep >= 5) return;
-    if (tutorialStep === 4 && piece.type === 'camp') return; // let them focus on drop in step 4
+    if (tutorialStep >= 5 && piece.id !== selectedPieceId) {
+       // Only allow closing if already open, or keep open in final view
+    }
     if (selectedPieceId === piece.id) {
-        setSelectedPieceId(null); // click again to close
+        setSelectedPieceId(null); 
     } else {
         setSelectedPieceId(piece.id);
     }
@@ -326,11 +371,10 @@ export default function App() {
     const leftPercent = (startOffset / daysInView) * 100;
     const widthPercent = (lengthInView / daysInView) * 100;
     
-    // Step 2 Guidance
     const showCampGuidance = (tutorialStep === 2 && campsCount < 2 && piece.type === 'camp' && !isActive);
-    
-    // Step 1 Guidance
     const showFixedGuidance = (tutorialStep === 1 && piece.id === 'fixed_0');
+
+    const isGreenRiver = piece.id === 'green-river-preserve';
 
     return (
       <div key={`${piece.id}_${weekStart.getTime()}`} style={{ position: 'relative' }}>
@@ -349,18 +393,36 @@ export default function App() {
           }}
         >
           <div className="tetromino-text">
-             {isZoomedOut && isMobile ? (piece.title.includes('NASA') ? '🚀' : '•') : piece.title}
+             {isZoomedOut && isMobile ? piece.emoji : `${piece.emoji} ${piece.title}`}
           </div>
 
-          {selectedPieceId === piece.id && !piece.isFixed && (
+          {selectedPieceId === piece.id && (
             <div className="click-tooltip" onClick={(e) => e.stopPropagation()}>
               <h4>{piece.title}</h4>
               {piece.img && <img src={piece.img} alt={piece.title} />}
               <p>{piece.desc}</p>
               {piece.url !== '#' && <a href={piece.url} target="_blank" rel="noreferrer">Visit Website</a>}
-              <button onClick={() => togglePieceActive(piece)}>
-                 {isActive ? "Remove from Schedule" : "Add to Schedule!"}
-              </button>
+              
+              {!piece.isFixed && (
+                <>
+                  {isGreenRiver ? (
+                    <div style={{display:'flex', gap:'5px', flexDirection:'column'}}>
+                       <button onClick={() => togglePieceActive(piece, "Climbing")}>
+                          {selectedOptions[piece.id] === 'Climbing' ? "Switch to Biking?" : "Join: Rock Climbing"}
+                       </button>
+                       <button onClick={() => togglePieceActive(piece, "Biking")}>
+                          {selectedOptions[piece.id] === 'Biking' ? "Switch to Climbing?" : "Join: Mountain Biking"}
+                       </button>
+                       {isActive && <button style={{background:'var(--block-red)'}} onClick={() => togglePieceActive(piece)}>Remove Session</button>}
+                    </div>
+                  ) : (
+                    <button onClick={() => togglePieceActive(piece)}>
+                       {isActive ? "Remove from Schedule" : "Add to Schedule!"}
+                    </button>
+                  )}
+                </>
+              )}
+              {piece.isFixed && <p style={{fontSize:'0.8rem', color:'var(--block-cyan)'}}>Fixed Schedule Event</p>}
             </div>
           )}
         </div>
@@ -434,7 +496,7 @@ export default function App() {
           <div className="tutorial-modal">
             <h2>A SPECIAL CHOICE! 🚀</h2>
             <p>NASA Space Academy is an amazing, high-tech experience.</p>
-            <p><strong>This camp is really special, so if you pick it, it'll be the only summer camp we can do this summer!</strong></p>
+            <p><strong>This camp is very special! If you pick it, you can only pick one other camp this summer, and it has to be Tryon Art School.</strong></p>
             <button className="tutorial-btn" onClick={() => setNasaPopupActive(false)}>Got It!</button>
           </div>
         </div>
@@ -482,14 +544,7 @@ export default function App() {
           <h1>Summer Planner</h1>
           <div className="view-controls">
             <button 
-              className={`view-btn ${isWeekdayOnly ? 'active' : ''}`} 
-              onClick={(e) => { e.stopPropagation(); setIsWeekdayOnly(!isWeekdayOnly); }}
-              title="Toggle Weekends"
-            >
-              {isWeekdayOnly ? "📅 7-Day" : "📅 5-Day"}
-            </button>
-            <button 
-              className={`view-btn ${isZoomedOut ? 'active' : ''}`} 
+              className={`view-btn ${isZoomedOut ? 'active' : ''} ${meetsRequirements && tutorialStep >= 5 ? 'pulse-nudge' : ''}`} 
               onClick={(e) => { e.stopPropagation(); setIsZoomedOut(!isZoomedOut); }}
               title="Toggle Zoom"
             >
@@ -534,7 +589,7 @@ export default function App() {
       {/* Drag Tray at Bottom */}
       {tutorialStep === 4 && (
         <div className="drag-tray">
-           <h4>Drag elements into calendar to schedule! ➔</h4>
+           <h4>Click an item, then click a day! (Or drag & drop) ➔</h4>
            <div className="tray-items">
               
               {/* L piece (Boxing) */}
@@ -628,7 +683,7 @@ export default function App() {
       <main className="timeline-scroll">
         <div className="calendar-grid">
           {WEEKS_ARRAY.map((originalWeekDays, wIdx) => {
-            const weekDays = isWeekdayOnly ? originalWeekDays.slice(1, 6) : originalWeekDays;
+            const weekDays = originalWeekDays;
             const weekStart = originalWeekDays[0];
             const weekEnd = originalWeekDays[6];
             let weekPieces = allPieces.filter(p => p.endDate >= weekStart && p.startDate <= weekEnd);
@@ -679,7 +734,7 @@ export default function App() {
                      {mCfg.name}
                   </div>
                 )}
-                <div className={`week-row ${isWeekdayOnly ? 'weekday-only' : ''}`} style={{ minHeight: `${reqHeight}px`, backgroundColor: mCfg.color }}>
+                <div className="week-row" style={{ minHeight: `${reqHeight}px`, backgroundColor: mCfg.color }}>
                   
                   {/* Background grid */}
                   <div className="week-bg">
@@ -689,16 +744,12 @@ export default function App() {
                       const activeType = draggingType || selectedTrayType;
                       const isEligible = activeType && (activeType !== 'boxing' || [1, 3, 6].includes(dayNum));
 
-                      // Check if there's a hidden weekend activity for this week
-                      const hasWeekendActivity = isWeekdayOnly && dIdx === 4 && weekPieces.some(p => {
-                         const pDay = getDay(p.startDate);
-                         return (pDay === 0 || pDay === 6) && activeIds.has(p.id);
-                      });
+                      // Filter logic for weekends removed for 7-day consistency
 
                       return (
                         <div 
                            key={dIdx} 
-                           className={`day-col ${dIdx === 0 || dIdx === 6 || (isWeekdayOnly && (dIdx === -1)) ? 'weekend' : ''} ${isEligible ? 'drop-eligible' : ''} ${hoveredDayKey === `${wIdx}-${dIdx}` || (selectedTrayType && isEligible) ? 'hover-active' : ''}`}
+                           className={`day-col ${dIdx === 0 || dIdx === 6 ? 'weekend' : ''} ${isEligible ? 'drop-eligible' : ''} ${hoveredDayKey === `${wIdx}-${dIdx}` || (selectedTrayType && isEligible) ? 'hover-active' : ''}`}
                            onDragOver={(e) => {
                              if (isEligible) e.preventDefault();
                            }}
@@ -735,7 +786,6 @@ export default function App() {
                               <span className="day-header">{format(d, isMobile ? 'EEEEE' : 'EEE')}</span>
                               <span className="day-number">{format(d, 'd')}</span>
                             </div>
-                            {hasWeekendActivity && <div className="weekend-indicator" title="Events scheduled on weekend">★</div>}
                           </div>
                         </div>
                       );

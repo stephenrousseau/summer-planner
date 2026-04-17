@@ -18,13 +18,6 @@
       "source": 4
     },
     {
-      "title": "Jack Rabbit Camping",
-      "start": "2026-06-26",
-      "end": "2026-06-28",
-      "type": "family_trip",
-      "source": 4
-    },
-    {
       "title": "Road Trip (Philly, Lancaster, Hershey, NYC)",
       "start": "2026-06-29",
       "end": "2026-07-05",
@@ -51,7 +44,7 @@
     },
     {
       "id": "nasa-space-academy-may",
-      "title": "NASA Space Academy",
+      "title": "NASA Space Academy (Week 1)",
       "start": "2026-05-31",
       "end": "2026-06-05",
       "exclusive": true,
@@ -61,7 +54,7 @@
     },
     {
       "id": "nasa-space-academy-jun",
-      "title": "NASA Space Academy",
+      "title": "NASA Space Academy (Week 2)",
       "start": "2026-06-07",
       "end": "2026-06-12",
       "exclusive": true,
@@ -71,7 +64,7 @@
     },
     {
       "id": "nasa-space-academy-jul",
-      "title": "NASA Space Academy",
+      "title": "NASA Space Academy (Week 3)",
       "start": "2026-07-26",
       "end": "2026-07-31",
       "exclusive": true,
@@ -81,7 +74,7 @@
     },
     {
       "id": "nasa-space-academy-aug",
-      "title": "NASA Space Academy",
+      "title": "NASA Space Academy (Week 4)",
       "start": "2026-08-02",
       "end": "2026-08-07",
       "exclusive": true,

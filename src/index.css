@@ -163,7 +163,6 @@ body {
   border: 1px solid var(--grid-line);
   border-radius: 8px;
   position: relative;
-  /* overflow: hidden removed to allow tooltips to bleed over bounds */
 }
 
 /* Background days layer */
@@ -171,10 +170,6 @@ body {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   height: 100%;
-}
-
-.week-row.weekday-only .week-bg {
-  grid-template-columns: repeat(5, 1fr);
 }
 
 .day-col {
@@ -445,6 +440,18 @@ body {
   100% { transform: scale(1); }
 }
 
+.pulse-nudge {
+   animation: pulse-nudge-glow 1.5s infinite alternate;
+   background: var(--block-green) !important;
+   color: #000 !important;
+   border-color: #fff !important;
+}
+
+@keyframes pulse-nudge-glow {
+  from { box-shadow: 0 0 5px var(--block-green); border-color: var(--block-cyan); }
+  to { box-shadow: 0 0 25px var(--block-green), 0 0 10px var(--block-cyan); border-color: #fff; transform: scale(1.1); }
+}
+
 /* Tooltip arrow */
 .tooltip-point {
   position: absolute;
@@ -529,10 +536,6 @@ body {
   }
   
   .week-row {
-    min-width: 100%;
-  }
-
-  .week-row.weekday-only {
     min-width: 100%;
   }
   
@@ -665,6 +668,18 @@ body {
 .tetromino-shape:hover {
   transform: scale(1.15) translateY(-5px);
 }
+.tetromino-shape.tray-selected {
+  transform: scale(1.15) translateY(-10px);
+  filter: drop-shadow(0 0 15px var(--block-cyan));
+}
+.tetromino-shape.tray-selected .t-cube {
+  border-color: white;
+  animation: pulse-border 1s infinite alternate;
+}
+@keyframes pulse-border {
+  from { box-shadow: 0 0 5px var(--block-cyan); }
+  to { box-shadow: 0 0 20px var(--block-cyan); }
+}
 .tetromino-shape:active {
   cursor: grabbing;
 }
@@ -709,10 +724,21 @@ body {
   box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
 }
 
+.day-col.drop-eligible {
+  background: rgba(0, 229, 255, 0.05);
+  cursor: pointer;
+}
+
 .day-col.hover-active {
-  background: rgba(0, 229, 255, 0.15);
-  box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.3);
+  background: rgba(0, 229, 255, 0.25);
+  box-shadow: inset 0 0 25px rgba(0, 229, 255, 0.5);
   cursor: copy;
+  animation: flash-bg 0.5s infinite alternate;
+}
+
+@keyframes flash-bg {
+  from { background: rgba(0, 229, 255, 0.15); }
+  to { background: rgba(0, 229, 255, 0.35); }
 }
 
 /* Fix flickering: prevent children from stealing drag events */
